@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_home"
+            android:title="Home"
+            android:icon="@drawable/ic_home_menu" />
+        <item
+            android:id="@+id/nav_vehicles"
+            android:title="Vehicles"
+            android:icon="@drawable/ic_car_menu"/>
+        <item
+            android:id="@+id/nav_trips"
+            android:title="Trips"
+            android:icon="@drawable/ic_trips_menu"/>
+        <item
+            android:id="@+id/nav_settings"
+            android:title="Settings"
+            android:icon="@drawable/ic_settings_menu"/>
+    </group>
+</menu>
