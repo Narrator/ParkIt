@@ -18,7 +18,7 @@ import java.util.Arrays;
 public class Helper extends SQLiteOpenHelper {
 
     // String constants that contain our SQLite DB info
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 8;
     private static final String DATABASE_NAME = "ParkIt.db";
     private static final String TABLE_NAME = "user_access";
     private static final String COLUMN_ID = "Id";
@@ -38,7 +38,7 @@ public class Helper extends SQLiteOpenHelper {
             " (" + COLUMN_ID + " INTEGER PRIMARY KEY NOT NULL, " + COLUMN_USER_ID +
             " DOUBLE NOT NULL, " + COLUMN_ACCESS_TOKEN + " TEXT NOT NULL, " + COLUMN_REFRESH_TOKEN +
             " TEXT NOT NULL, " + COLUMN_TTL + " DOUBLE NOT NULL, " + COLUMN_AT_CREATED + " DATETIME NOT NULL, " +
-            COLUMN_ROLES + " TEXT NOT NULL, " + COLUMN_CURRENT_ROLE + " TEXT NOT NULL );";
+            COLUMN_ROLES + " TEXT, " + COLUMN_CURRENT_ROLE + " TEXT );";
 
     // this is the helper's constructor
     public Helper(Context context) {
@@ -46,7 +46,7 @@ public class Helper extends SQLiteOpenHelper {
     }
 
     // insert query method
-    public void insertUserAccess (UserAccess u) {
+    public UserAccess insertUserAccess (UserAccess u) {
         db = this.getWritableDatabase();
         // store all the insert values into a container
         ContentValues values = new ContentValues();
@@ -63,8 +63,10 @@ public class Helper extends SQLiteOpenHelper {
 
         if (count < 1) {
             values.put(COLUMN_ID, 1);
+            u.setId(1);
         } else {
             values.put(COLUMN_ID, count +1);
+            u.setId(count + 1);
         }
 
         // We then use the count as the ID for the next entry into the DB
@@ -85,6 +87,7 @@ public class Helper extends SQLiteOpenHelper {
         db.insert(TABLE_NAME, null, values);
         // Close the connection after all queries
         db.close();
+        return u;
     }
 
     // update query method
@@ -128,13 +131,14 @@ public class Helper extends SQLiteOpenHelper {
             // Execute do..while loop to iterate through the results
             do {
                 // Capture the userId
+                b.setId(cursor.getInt(0));
                 b.setUserId(cursor.getDouble(1));
                 b.setAccessToken(cursor.getString(2));
                 b.setRefreshToken(cursor.getString(3));
                 b.setTtl(cursor.getDouble(4));
                 b.setCreated(OffsetDateTime.parse(cursor.getString(5)));
                 b.setRoles(Arrays.asList(TextUtils.split(cursor.getString(6),",")));
-
+                b.setCurrentRole(cursor.getString(7));
             } while (cursor.moveToNext());
         }
         db.close();

@@ -103,7 +103,7 @@ public class ExchangeToken extends AsyncTask <String, Void, JSONObject> {
             Helper helper = new Helper(mContext);
             helper.deleteAll();
 
-            helper.insertUserAccess(ua);
+            ua = helper.insertUserAccess(ua);
 
             // ASYNC->ACTIVITY CALL STARTING ACTIVITY FROM ASYNC
             Intent i = new Intent();

@@ -86,7 +86,8 @@ public class SplashActivity extends BaseInjectionActivity {
                                 }
 
                                 // Update in SQLite (update)
-                                UserAccess ua = new UserAccess(jObj);
+                                UserAccess updatedUa = new UserAccess(jObj);
+                                updatedUa.setId(ua.getId());
                                 Helper helper = new Helper(mContext);
 
                                 ua = helper.updateUserAccess(ua);

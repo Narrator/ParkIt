@@ -78,7 +78,7 @@ public class RoleSelectActivity extends AsyncDrawerActivity {
             roles = updatableRoles;
             ua.setRoles(roles);
             ua.setCurrentRole(role);
-            helper.updateUserAccess(ua);
+            ua = helper.updateUserAccess(ua);
 
         }
 

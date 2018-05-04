@@ -23,6 +23,7 @@ public class UserAccess implements Parcelable {
     }
 
     public void writeToParcel(Parcel out, int flags) {
+        out.writeInt(id);
         out.writeDouble(userId);
         out.writeDouble(ttl);
         out.writeString(accessToken);
@@ -48,6 +49,7 @@ public class UserAccess implements Parcelable {
     };
 
     private UserAccess(Parcel in) {
+        id = in.readInt();
         userId = in.readDouble();
         ttl = in.readDouble();
         accessToken = in.readString();
@@ -55,7 +57,6 @@ public class UserAccess implements Parcelable {
         currentRole = in.readString();
         at_created = OffsetDateTime.parse(in.readString());
         roles = Arrays.asList(TextUtils.split(in.readString(),","));
-
     }
 
     public UserAccess() {
