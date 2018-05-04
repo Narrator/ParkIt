@@ -9,4 +9,5 @@
     <color name="colorPrimaryOld">#00FF63</color>
     <color name="colorPrimaryDarkOld">#00A445</color>
     <color name="colorText">#000000</color>
+    <color name="colorRed">#F55555</color>
 </resources>

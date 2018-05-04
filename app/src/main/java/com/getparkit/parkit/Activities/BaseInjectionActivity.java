@@ -1,5 +1,6 @@
 package com.getparkit.parkit.Activities;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import com.getparkit.parkit.Activities.AsyncDrawerActivities.OwnerHomeScreenActi
 import com.getparkit.parkit.Activities.HelperActivities.ErrorActivity;
 import com.getparkit.parkit.Classes.AuthenticatedApiClient;
 import com.getparkit.parkit.Classes.UserAccess;
+import com.getparkit.parkit.Interfaces.GenericListener;
 
 import java.util.List;
 
@@ -21,7 +23,12 @@ import io.swagger.client.model.Vehicle;
 import retrofit2.Call;
 import retrofit2.Callback;
 
-public class BaseInjectionActivity extends AppCompatActivity {
+public abstract class BaseInjectionActivity extends AppCompatActivity implements GenericListener {
+
+    // Generic Listener
+    public GenericListener gl = this;
+
+    public Activity loadingActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

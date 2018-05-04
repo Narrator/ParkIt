@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -34,7 +35,7 @@ import io.swagger.client.api.UserApi;
 import retrofit2.Call;
 import retrofit2.Callback;
 
-public abstract class AsyncDrawerActivity extends BaseInjectionActivity implements GenericListener {
+public abstract class AsyncDrawerActivity extends BaseInjectionActivity {
 
     // Contexts, helpers and handlers
     public Context mContext = this;
@@ -43,9 +44,6 @@ public abstract class AsyncDrawerActivity extends BaseInjectionActivity implemen
 
     // List of Async Calls
     public List<Call<Object>> objCalls = new ArrayList<>();
-
-    // Generic Listener
-    public GenericListener gl = this;
 
     // SQLITE - local cache object
     public UserAccess ua;
@@ -77,10 +75,32 @@ public abstract class AsyncDrawerActivity extends BaseInjectionActivity implemen
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_async_drawer);
 
+        // First destroy loading activity
+        if (loadingActivity != null && !loadingActivity.isDestroyed()) {
+            loadingActivity.finish();
+        }
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         mDrawerLayout = findViewById(R.id.drawer_layout);
 
         navigationView = findViewById(R.id.nav_view);
+
+        // Get the UserAccess object from the previous intent.
+        Intent i = getIntent();
+        ua = i.getParcelableExtra("user-access");
+
+        // Hide the park button
+        ImageView changeRoleView = navigationView.findViewById(R.id.change_role);
+        Button parkButton = findViewById(R.id.park);
+
+        if (ua.getCurrentRole().equals("parker")) {
+            changeRoleView.setImageDrawable(getDrawable(R.drawable.dollar_icon));
+        } else {
+            changeRoleView.setImageDrawable(getDrawable(R.drawable.parker_icon));
+            parkButton.setVisibility(View.INVISIBLE);
+        }
+
+
         navigationView.setItemIconTintList(null);
 
         navigationView.setNavigationItemSelectedListener(
@@ -111,12 +131,6 @@ public abstract class AsyncDrawerActivity extends BaseInjectionActivity implemen
             // Code here executes on main thread after user presses button
             }
         });
-
-        // Get the UserAccess object from the previous intent.
-        Intent i = getIntent();
-        ua = i.getParcelableExtra("user-access");
-
-        // ua = helper.searchUserAccess();
 
         // If it exists, we'll get profile_pic, name etc.
         if ((ua.getUserId() != null) && (ua.getAccessToken() != null)) {
@@ -156,6 +170,7 @@ public abstract class AsyncDrawerActivity extends BaseInjectionActivity implemen
 
                                 drawer_fullName.setText(fullNameText);
                                 drawer_email.setText(email);
+
                                 new DownloadImageTask(drawer_profilePic)
                                         .execute(profilePicUrl);
                                 popCalls(mDrawerLayout, call);
@@ -202,5 +217,23 @@ public abstract class AsyncDrawerActivity extends BaseInjectionActivity implemen
         if (objCalls.size() == 0) {
             gl.callback(v,"done");
         }
+    }
+
+    public static ArrayList<View> getViewsByTag(ViewGroup root, String tag){
+        ArrayList<View> views = new ArrayList<View>();
+        final int childCount = root.getChildCount();
+        for (int i = 0; i < childCount; i++) {
+            final View child = root.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                views.addAll(getViewsByTag((ViewGroup) child, tag));
+            }
+
+            final Object tagObj = child.getTag();
+            if (tagObj != null && tagObj.equals(tag)) {
+                views.add(child);
+            }
+
+        }
+        return views;
     }
 }

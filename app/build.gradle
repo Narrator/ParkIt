@@ -4,7 +4,7 @@ android {
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.getparkit.parkit"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
@@ -57,4 +57,5 @@ dependencies {
     implementation files('libs/android-async-http-1.4.9/android-async-http-1.4.9.jar')
     implementation 'com.android.support:design:26.1.0'
     implementation 'de.hdodenhof:circleimageview:1.2.1'
+    implementation 'com.google.android.gms:play-services-places:12.0.1'
 }

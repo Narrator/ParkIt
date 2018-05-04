@@ -2,7 +2,7 @@
     android:id="@+id/asyncDrawerMainView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginTop="75dp"
+    android:layout_marginTop="60dp"
     android:background="@color/colorAloe"
     android:gravity="top"
     android:orientation="vertical"
@@ -63,20 +63,20 @@
                 android:textSize="16sp" />
 
             <LinearLayout
+                android:id="@+id/parker"
                 android:layout_width="200dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="25dp"
                 android:layout_marginRight="25dp"
                 android:layout_marginTop="50dp"
                 android:background="@drawable/card_shadow"
-                android:gravity="center">
+                android:gravity="center"
+                android:onClick="addRole">
 
                 <TextView
-                    android:id="@+id/parker"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:onClick="addRole"
                     android:text="PARK"
                     android:textAlignment="center"
                     android:textColor="@android:color/white" />
@@ -84,20 +84,20 @@
 
 
             <LinearLayout
+                android:id="@+id/psOwner"
                 android:layout_width="200dp"
                 android:layout_height="50dp"
                 android:layout_marginLeft="25dp"
                 android:layout_marginRight="25dp"
                 android:layout_marginTop="25dp"
                 android:background="@drawable/card_shadow"
-                android:gravity="center">
+                android:gravity="center"
+                android:onClick="addRole">
 
                 <TextView
-                    android:id="@+id/psOwner"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:onClick="addRole"
                     android:text="RENT"
                     android:textAlignment="center"
                     android:textColor="@android:color/white" />

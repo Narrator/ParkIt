@@ -47,6 +47,11 @@ public class LoginActivity extends BaseInjectionActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        // First destroy loading activity
+        if (loadingActivity != null && !loadingActivity.isDestroyed()) {
+            loadingActivity.finish();
+        }
+
         // Google
         gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestIdToken("351987647675-ir6tjeqqfba89l2q1e3ab8c1cfnp50cj.apps.googleusercontent.com")
@@ -103,5 +108,10 @@ public class LoginActivity extends BaseInjectionActivity {
             startActivity(new Intent(LoginActivity.this, ErrorActivity.class));
             // updateUI(null);
         }
+    }
+
+    @Override
+    public void callback(View view, String result) {
+
     }
 }

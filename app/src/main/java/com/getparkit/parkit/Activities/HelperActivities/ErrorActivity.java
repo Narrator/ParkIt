@@ -6,14 +6,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
+import com.getparkit.parkit.Activities.BaseInjectionActivity;
 import com.getparkit.parkit.R;
 
-public class ErrorActivity extends AppCompatActivity {
+public class ErrorActivity extends BaseInjectionActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_error);
+
+        // First destroy loading activity
+        if (loadingActivity != null && !loadingActivity.isDestroyed()) {
+            loadingActivity.finish();
+        }
     }
 
     public void onTryAgain(View v) {
@@ -21,5 +27,9 @@ public class ErrorActivity extends AppCompatActivity {
         returnIntent.putExtra("REFRESH",1);
         setResult(RESULT_OK, returnIntent);
         finish();
+    }
+    @Override
+    public void callback(View view, String result) {
+
     }
 }

@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Handler;
 import android.util.Log;
+import android.view.View;
 
 import com.getparkit.parkit.Activities.AsyncDrawerActivities.AddParkingSpaceActivity;
 import com.getparkit.parkit.Activities.AsyncDrawerActivities.AddVehicleActivity;
@@ -72,8 +73,6 @@ public class SplashActivity extends BaseInjectionActivity {
                                 return;
                             }
                             try {
-
-                                Log.d("RB",response.body().toString());
                                 Gson gson = new Gson();
                                 JsonObject jsonObject = gson.toJsonTree(response.body()).getAsJsonObject();
                                 JSONObject jObj = new JSONObject(jsonObject.toString());
@@ -103,7 +102,7 @@ public class SplashActivity extends BaseInjectionActivity {
                                     i.putExtra("user-access", ua);
                                     startActivity(i);
                                     finish();
-                                } else if (role == "parker") {
+                                } else if (role.equals("parker")) {
                                     checkVehicles(client, SplashActivity.this, HomeScreenActivity.class, ua);
                                     return;
                                 } else {
@@ -132,7 +131,7 @@ public class SplashActivity extends BaseInjectionActivity {
                 // close splash activity
                 finish();
             }
-        }, 2000);
+        }, 0);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -147,4 +146,9 @@ public class SplashActivity extends BaseInjectionActivity {
             }
         }
     }//onActivityResult
+
+    @Override
+    public void callback(View view, String result) {
+
+    }
 }
