@@ -54,8 +54,9 @@
         <activity android:name=".Activities.HelperActivities.ErrorActivity" />
         <activity android:name=".Activities.AsyncDrawerActivities.RoleSelectActivity" />
         <activity android:name=".Activities.AsyncDrawerActivities.AddParkingSpaceActivity" />
-        <activity android:name=".Activities.AsyncDrawerActivities.OwnerHomeScreenActivity"></activity>
+        <activity android:name=".Activities.AsyncDrawerActivities.OwnerHomeScreenActivity" />
         <activity android:name=".Activities.AsyncDrawerActivities.AddVehicleActivity" />
+        <activity android:name=".Activities.AsyncDrawerActivities.AddSpotActivity"></activity>
     </application>
 
 </manifest>

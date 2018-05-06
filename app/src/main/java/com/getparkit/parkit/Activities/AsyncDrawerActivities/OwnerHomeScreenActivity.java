@@ -1,18 +1,20 @@
 package com.getparkit.parkit.Activities.AsyncDrawerActivities;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.getparkit.parkit.Activities.AsyncDrawerActivity;
 import com.getparkit.parkit.Activities.HelperActivities.ErrorActivity;
-import com.getparkit.parkit.Async.DownloadImageTask;
 import com.getparkit.parkit.Classes.AuthenticatedApiClient;
-import com.getparkit.parkit.Classes.UserAccess;
+import com.getparkit.parkit.Classes.SpotAdapter;
 import com.getparkit.parkit.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,17 +23,22 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.math.BigDecimal;
 import java.util.List;
 
+import io.swagger.client.api.ParkingSpaceApi;
 import io.swagger.client.api.UserApi;
 import io.swagger.client.model.ParkingSpace;
+import io.swagger.client.model.Spot;
 import retrofit2.Call;
 import retrofit2.Callback;
 
-public class OwnerHomeScreenActivity extends AsyncDrawerActivity implements OnMapReadyCallback {
+public class OwnerHomeScreenActivity extends AsyncDrawerActivity  implements OnMapReadyCallback  {
 
     private GoogleMap mMap;
+    private ParkingSpace ctxParkingSpace;
+    private RecyclerView mRecyclerView;
+    private SpotAdapter spotAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +88,7 @@ public class OwnerHomeScreenActivity extends AsyncDrawerActivity implements OnMa
                 for (ParkingSpace parkingSpace: parkingSpaces) {
                     if (parkingSpace.isDefault()) {
                         defaultPs = parkingSpace;
+                        ctxParkingSpace = defaultPs;
                         break;
                     }
                 }
@@ -95,6 +103,60 @@ public class OwnerHomeScreenActivity extends AsyncDrawerActivity implements OnMa
 
                 String addressText = "Your parking garage at: " + defaultPs.getAddress();
                 parkingSpaceName.setText(addressText);
+
+                // Get the parking spots of the parking space, other show text asking user to add.
+                ParkingSpaceApi parkingSpaceApi = client.createService(ParkingSpaceApi.class);
+
+                Call<List<Spot>> spotCall = parkingSpaceApi.parkingSpacePrototypeGetSpots(defaultPs.getId().toString(),"");
+
+                spotCall.enqueue(new Callback<List<Spot>>() {
+                    @Override
+                    public void onResponse(Call<List<Spot>> call, retrofit2.Response<List<Spot>> response) {
+                        if (client.handleError(response, OwnerHomeScreenActivity.this, OwnerHomeScreenActivity.class, ua)) {
+                            return;
+                        }
+
+                        List<Spot> spots = response.body();
+                        TextView spotFillerText = findViewById(R.id.spotsFillerText);
+                        if (spots.size() < 1) {
+                            spotFillerText.setText("Each garage can have multiple parking spots. Looks like you haven't added any spots to this garage yet! Please do so using the button below.");
+                            return;
+                        } else {
+                            spotFillerText.setVisibility(View.INVISIBLE);
+
+                            View spotHeaderView = LayoutInflater.from(OwnerHomeScreenActivity.this).inflate(
+                                    R.layout.spot_header, null);
+
+                            LinearLayout ownerScreenWrapper = findViewById(R.id.ownerScreenWrapper);
+                            ownerScreenWrapper.addView(spotHeaderView, 1);
+
+                            mRecyclerView = findViewById(R.id.spotsWrapper);
+
+                            // use this setting to improve performance if you know that changes
+                            // in content do not change the layout size of the RecyclerView
+                            mRecyclerView.setHasFixedSize(true);
+
+                            // use a linear layout manager
+                            mLayoutManager = new LinearLayoutManager(OwnerHomeScreenActivity.this);
+                            mRecyclerView.setLayoutManager(mLayoutManager);
+
+                            // use adapter
+                            spotAdapter = new SpotAdapter(spots);
+
+                            mRecyclerView.setAdapter(spotAdapter);
+
+                        }
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<List<Spot>> call, Throwable t) {
+                        Log.d("SERVER_ERROR", "Error dealing with the response: " + t.getMessage());
+                        startActivityForResult(new Intent(OwnerHomeScreenActivity.this, ErrorActivity.class), 1);
+                        finish();
+                    }
+                });
+
             }
 
             @Override
@@ -112,5 +174,12 @@ public class OwnerHomeScreenActivity extends AsyncDrawerActivity implements OnMa
     public void callback(View view, String result) {
     }
 
+    public void addSpot(View v) {
+        Intent i = new Intent(OwnerHomeScreenActivity.this, AddSpotActivity.class);
+        i.putExtra("parkingSpaceId", ctxParkingSpace.getId().toString());
+        i.putExtra("user-access", ua);
+        startActivity(i);
+        finish();
+    }
 
 }
