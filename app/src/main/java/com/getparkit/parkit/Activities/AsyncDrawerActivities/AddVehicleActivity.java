@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.getparkit.parkit.Activities.AsyncDrawerActivity;
 import com.getparkit.parkit.Activities.HelperActivities.ErrorActivity;
+import com.getparkit.parkit.Activities.HelperActivities.LoadingActivity;
+import com.getparkit.parkit.Activities.LoginActivity;
 import com.getparkit.parkit.R;
 
 import java.util.ArrayList;
@@ -82,6 +84,10 @@ public class AddVehicleActivity extends AsyncDrawerActivity {
             toast.show();
             return;
         }
+
+        Intent i = new Intent(AddVehicleActivity.this, LoadingActivity.class);
+        startActivity(i);
+
         NewVehicle newVehicle = new NewVehicle();
 
         newVehicle.setMake(((EditText) findViewById(R.id.make)).getText().toString());

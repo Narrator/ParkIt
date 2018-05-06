@@ -3,7 +3,6 @@ package com.getparkit.parkit.Activities.AsyncDrawerActivities;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -13,26 +12,21 @@ import android.widget.Toast;
 
 import com.getparkit.parkit.Activities.AsyncDrawerActivity;
 import com.getparkit.parkit.Activities.HelperActivities.ErrorActivity;
-import com.getparkit.parkit.Async.DownloadImageTask;
-import com.getparkit.parkit.Classes.UserAccess;
+import com.getparkit.parkit.Activities.HelperActivities.LoadingActivity;
 import com.getparkit.parkit.R;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
-import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-import com.google.android.gms.location.places.ui.PlaceSelectionListener;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.List;
 
-import io.swagger.client.model.NewVehicle;
+import io.swagger.client.model.GeoPoint;
+import io.swagger.client.model.NewParkingSpace;
+import io.swagger.client.model.ParkingSpace;
 import io.swagger.client.model.Vehicle;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -40,9 +34,10 @@ import retrofit2.Callback;
 public class AddParkingSpaceActivity extends AsyncDrawerActivity {
 
     private LinearLayout form;
-    private GoogleMap mMap;
     private EditText address;
+    private Place place;
     private int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -86,9 +81,10 @@ public class AddParkingSpaceActivity extends AsyncDrawerActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_AUTOCOMPLETE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                Place place = PlaceAutocomplete.getPlace(this, data);
-                Log.i("PLACE", "Place: " + place.getName());
-                address.setText(place.getAddress());
+                Place place1 = PlaceAutocomplete.getPlace(this, data);
+                Log.i("PLACE", "Place: " + place1.getName());
+                address.setText(place1.getAddress());
+                place = place1;
                 // EditText stuff...
             } else if (resultCode == PlaceAutocomplete.RESULT_ERROR) {
                 Status status = PlaceAutocomplete.getStatus(this, data);
@@ -123,39 +119,66 @@ public class AddParkingSpaceActivity extends AsyncDrawerActivity {
                 e.printStackTrace();
             }
         }
+
+        // ToDo: handle custom addresses... (non google-searched ones)
+        if (place == null) {
+            valid = false;
+        }
         if (!valid) {
             Toast toast = Toast.makeText(getApplicationContext(),"Please fill out all the fields!", Toast.LENGTH_LONG);
             toast.show();
             return;
         }
 
-        NewVehicle newVehicle = new NewVehicle();
+        Intent i = new Intent(AddParkingSpaceActivity.this, LoadingActivity.class);
+        startActivity(i);
 
-        newVehicle.setMake(((EditText) findViewById(R.id.make)).getText().toString());
-        newVehicle.setModel(((EditText) findViewById(R.id.model)).getText().toString());
-        newVehicle.setYear(((EditText) findViewById(R.id.year)).getText().toString());
-        newVehicle.setLicensePlate(((EditText) findViewById(R.id.license)).getText().toString());
-        newVehicle.setState(((EditText) findViewById(R.id.state)).getText().toString());
-        newVehicle.setColor(((EditText) findViewById(R.id.color)).getText().toString());
+        NewParkingSpace newParkingSpace = new NewParkingSpace();
 
-        Call<Vehicle> call = userApi.userPrototypeCreateVehicles("me", newVehicle);
+        GeoPoint location = new GeoPoint();
+        location.setLat(BigDecimal.valueOf(place.getLatLng().latitude));
+        location.setLng(BigDecimal.valueOf(place.getLatLng().longitude));
 
-        call.enqueue(new Callback<Vehicle>() {
+        List<Address> addressList = null;
+
+        Geocoder geocoder = new Geocoder(getApplicationContext());
+
+        try {
+            addressList = geocoder.getFromLocation(place.getLatLng().latitude, place.getLatLng().longitude, 1);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Address address = addressList.get(0);
+
+        newParkingSpace.setAddress(place.getName().toString());
+        newParkingSpace.setCity(address.getLocality());
+        newParkingSpace.setCountry(address.getCountryCode());
+        newParkingSpace.setState(address.getAdminArea());
+        newParkingSpace.setStreetNumber(address.getFeatureName());
+        newParkingSpace.setRoute(address.getThoroughfare());
+        newParkingSpace.setZipCode(address.getPostalCode());
+        newParkingSpace.setLocation(location);
+        newParkingSpace.setDefault(true);
+
+        Call<ParkingSpace> call = userApi.userPrototypeCreateParkingSpaces("me", newParkingSpace);
+
+        call.enqueue(new Callback<ParkingSpace>() {
             @Override
-            public void onResponse(Call<Vehicle> call, retrofit2.Response<Vehicle> response) {
+            public void onResponse(Call<ParkingSpace> call, retrofit2.Response<ParkingSpace> response) {
                 if (client.handleError(response, AddParkingSpaceActivity.this, HomeScreenActivity.class, ua)) {
                     return;
                 }
 
-                Intent i = new Intent(AddParkingSpaceActivity.this,HomeScreenActivity.class);
+                Intent i = new Intent(AddParkingSpaceActivity.this, OwnerHomeScreenActivity.class);
                 i.putExtra("user-access", ua);
-                i.putExtra("messagae","Your vehicle has been added successfully!");
+                i.putExtra("messagae","Your parking space has been added successfully!");
                 startActivity(i);
                 finish();
             }
 
             @Override
-            public void onFailure(Call<Vehicle> call, Throwable t) {
+            public void onFailure(Call<ParkingSpace> call, Throwable t) {
                 Log.d("SERVER_ERROR","Error dealing with the response: " + t.getMessage());
                 startActivityForResult(new Intent(AddParkingSpaceActivity.this, ErrorActivity.class),1);
                 finish();
