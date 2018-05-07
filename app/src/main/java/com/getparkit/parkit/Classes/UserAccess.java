@@ -28,7 +28,7 @@ public class UserAccess implements Parcelable {
         out.writeDouble(ttl);
         out.writeString(accessToken);
         out.writeString(refreshToken);
-        out.writeString(currentRole);
+        out.writeString(currentRole); // Only on client
         out.writeString(at_created.toString());
         if (roles != null) {
             out.writeString(TextUtils.join(",", roles));

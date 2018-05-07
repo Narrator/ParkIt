@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -100,7 +101,6 @@ public abstract class AsyncDrawerActivity extends BaseInjectionActivity {
             parkButton.setVisibility(View.INVISIBLE);
         }
 
-
         navigationView.setItemIconTintList(null);
 
         navigationView.setNavigationItemSelectedListener(
@@ -118,6 +118,11 @@ public abstract class AsyncDrawerActivity extends BaseInjectionActivity {
                 return true;
                 }
             });
+
+        Menu nav_menu = navigationView.getMenu();
+
+        MenuItem vehicles = nav_menu.findItem(R.id.nav_vehicles);
+        vehicles.setVisible(false);
 
         navHeader = navigationView.getHeaderView(0);
         drawer_fullName = navHeader.findViewById(R.id.drawer_fullName);

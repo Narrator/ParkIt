@@ -8,7 +8,9 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.LinearLayout;
+import android.widget.Switch;
 import android.widget.TextView;
 
 import com.getparkit.parkit.Activities.AsyncDrawerActivity;
@@ -116,6 +118,9 @@ public class OwnerHomeScreenActivity extends AsyncDrawerActivity  implements OnM
                             return;
                         }
 
+                        View loading = findViewById(R.id.loadingWrapper);
+                        loading.setVisibility(View.GONE);
+
                         List<Spot> spots = response.body();
                         TextView spotFillerText = findViewById(R.id.spotsFillerText);
                         if (spots.size() < 1) {
@@ -179,7 +184,6 @@ public class OwnerHomeScreenActivity extends AsyncDrawerActivity  implements OnM
         i.putExtra("parkingSpaceId", ctxParkingSpace.getId().toString());
         i.putExtra("user-access", ua);
         startActivity(i);
-        finish();
     }
 
 }
